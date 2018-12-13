@@ -4,7 +4,7 @@
 
 
 ### Installation
-On your Ubuntu 18.04 server, run these commands
+On your Ubuntu 18.04 server, run these commands, answering `y` to all prompts:
 ```
 # Install Elixir and Erlang
 wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
@@ -22,8 +22,6 @@ sudo su
 
 ### Deployment
 Set your MailGun API Key with the following command: `export MAILGUN_API_KEY=<Your MailGun API Key>`
-
-Now run the following in the root console, answering `y` to all prompts:
 
 ```
 mix deps.get
