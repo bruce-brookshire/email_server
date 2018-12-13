@@ -1,20 +1,31 @@
-# EmailServer
+# Elixir Concurrent EmailServer
 
-To start your Phoenix server:
+# Getting started
 
-  * Install dependencies with `mix deps.get`
-  * Install Node.js dependencies with `cd assets && npm install`
-  * Start Phoenix endpoint with `mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Installation
+On your Ubuntu 18.04 server, run these to install elixir
+```
+wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+sudo dpkg -i erlang-solutions_1.0_all.deb
+sudo apt-get update
+sudo apt-get install esl-erlang
+sudo apt-get install elixir
+```
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+* Change directories with `$ cd /opt/`
+* Clone this repository: `$ git clone https://github.com/flyrboy96/email_server.git`
+* CD into that directory: `$ cd email_server`
+* Become sudo `$ sudo su`
 
-## Learn more
+## Deployment
+Set your MailGun API Key with the following command: `# export MAILGUN_API_KEY=<Your MailGun API Key>`
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
-# email_server
+Now run the following, answering `y` to all prompts:
+
+```
+# mix deps.get
+# MIX_ENV=prod PORT=80 elixir --detached -S mix do compile, phx.server
+```
+
+
