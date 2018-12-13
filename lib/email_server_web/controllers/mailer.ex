@@ -93,14 +93,14 @@ defmodule EmailServerWeb.Mailer do
 
         content = [body: body, headers: headers, basic_auth: auth]
 
-        # Task.start(
-        #     fn -> 
+        Task.start(
+            fn -> 
                 content = HTTPotion.post!(url, content) 
 
                 IO.puts "operation result for recipient: " <> recipient
                 IO.inspect content
-        #     end
-        # )
+            end
+        )
     end
 
 
