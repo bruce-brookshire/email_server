@@ -1,7 +1,6 @@
 defmodule EmailServerWeb.Router do
   use EmailServerWeb, :router
 
-  
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -9,11 +8,7 @@ defmodule EmailServerWeb.Router do
   scope "/v1", EmailServerWeb do
     pipe_through :api
 
-    get "/", PageController, :index
+    post "/mailer", Mailer, :send_mail
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", EmailServerWeb do
-  #   pipe_through :api
-  # end
 end
