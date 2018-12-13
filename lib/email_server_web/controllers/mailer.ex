@@ -81,24 +81,23 @@ defmodule EmailServerWeb.Mailer do
 
         conn
             |> put_status(:ok)
-            |> json(%{ "success" => "you did it"})
+            |> json(%{ "success" => "you did it, messages sent."})
         
     end
 
 
 
+    #Dirty work of sending this message
     def send_message(recipient, url, headers, params, auth) do
 
         body = Enum.join(params ++ ["to=" <> recipient], "&")
-
         content = [body: body, headers: headers, basic_auth: auth]
 
         Task.start(
             fn -> 
                 content = HTTPotion.post!(url, content) 
-
                 IO.puts "operation result for recipient: " <> recipient
-                IO.inspect content
+                IO.inspect content["status_code"]
             end
         )
     end
