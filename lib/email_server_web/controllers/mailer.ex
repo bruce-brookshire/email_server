@@ -58,6 +58,7 @@ defmodule EmailServerWeb.Mailer do
         
     end
 
+
     def prep_mail_file_payload(conn, recipients, filename, subject) do
         contents = File.read filename
         
@@ -92,13 +93,14 @@ defmodule EmailServerWeb.Mailer do
 
         content = [body: body, headers: headers, basic_auth: auth]
 
-        IO.inspect content
+        # Task.start(
+        #     fn -> 
+                content = HTTPotion.post!(url, content) 
 
-        Task.start(
-            fn -> 
-                HTTPotion.post!(url, content) 
-            end
-        )
+                IO.puts "operation result for recipient: " <> recipient
+                IO.inspect content
+        #     end
+        # )
     end
 
 
