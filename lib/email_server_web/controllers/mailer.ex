@@ -95,9 +95,7 @@ defmodule EmailServerWeb.Mailer do
 
         Task.start(
             fn -> 
-                content = HTTPotion.post!(url, content) 
-                IO.puts "operation result for recipient: " <> recipient
-                IO.inspect content["status_code"]
+                HTTPotion.post!(url, content)
             end
         )
     end
