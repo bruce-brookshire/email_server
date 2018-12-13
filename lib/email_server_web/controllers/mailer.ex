@@ -66,7 +66,7 @@ defmodule EmailServerWeb.Mailer do
                 
                 url = "https://api.mailgun.net/v3/emails.thatctoguy.com/messages"
                 headers = ["Content-Type": "application/x-www-form-urlencoded"]
-                params = ["from=info@thatctoguy.com", "subject=" <> subject, "html=" <> body]
+                params = ["from=Group 5 CC project<info@thatctoguy.com>", "subject=" <> subject, "html=" <> body]
                 auth = {"api", System.get_env("MAILGUN_API_KEY")}
 
                 recipients
@@ -94,9 +94,11 @@ defmodule EmailServerWeb.Mailer do
 
         IO.inspect content
 
-        # response = HTTPotion.post! url, content
-
-        # IO.inspect response
+        Task.start(
+            fn -> 
+                HTTPotion.post!(url, content) 
+            end
+        )
     end
 
 
