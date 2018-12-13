@@ -5,42 +5,45 @@ defmodule EmailServerWeb.Mailer do
     def send_mail(conn, params) do
         IO.inspect params
 
+        #Check our inputs to make sure theyre valid
+        
+        #TODO can we shrink these checks to be more readable?
+
+        #Do we have email recipients?
         if !Map.has_key?(params, "to") do 
             conn 
                 |> put_status(:unprocessable_entity)
                 |> json(%{ "error" =>  "missing field, :to"}) 
         end
 
+        #Do we have an email subject?
         if !Map.has_key?(params, "subject") do 
             conn 
                 |> put_status(:unprocessable_entity)
                 |> json(%{ "error" => "missing field, :subject"})
         end
 
+        #First set of valid inputs. 
+        #Below: we can still fail, but otherwise we have all other necessary information
         recipients = params["to"]
         subject = params["subject"]
 
+        #TODO this is not optimal. we are double returning conn responses. figure out how to prevent this
         cond do
             Map.has_key?(params, "message") -> 
-                prep_mail_text_payload(recipients, params["message"], subject)
+                prep_mail_text_payload(conn, recipients, params["message"], subject)
 
             Map.has_key?(params, "message_file") -> 
-                prep_mail_file_payload(recipients, params["message_file"], subject)
+                prep_mail_file_payload(conn, recipients, params["message_file"], subject)
 
             true -> 
                 conn 
-                |> put_status(:unprocessable_entity)
-                |> json(%{ "error" => "missing field, must have either :message, or :message_file"})
+                    |> put_status(:unprocessable_entity)
+                    |> json(%{ "error" => "missing field, must have either :message, or :message_file"})
         end
-        
-        message = params["message"]
-
-        conn
-            |> put_status(:ok)
-            |> json(%{ "success" => "you did it"})
     end
 
-    def prep_mail_text_payload(recipients, message, subject) do
+    def prep_mail_text_payload(conn, recipients, message, subject) do
         url = "https://api.mailgun.net/v3/emails.thatctoguy.com/messages"
         headers = ["Content-Type": "application/x-www-form-urlencoded"]
         params = ["from=info@thatctoguy.com", "subject=" <> subject, "text=" <> message]
@@ -48,17 +51,37 @@ defmodule EmailServerWeb.Mailer do
 
         recipients
             |> Enum.map(&(send_message &1, url, headers, params, auth))
+
+        conn
+            |> put_status(:ok)
+            |> json(%{ "success" => "you did it"})
         
     end
 
-    def prep_mail_file_payload(recipients, filename, subject) do
-        url = "https://api.mailgun.net/v3/emails.thatctoguy.com/messages"
-        headers = ["Content-Type": "application/x-www-form-urlencoded"]
-        params = ["from=info@thatctoguy.com", "subject=" <> subject, "text=" <> filename]
-        auth = {"api", System.get_env("MAILGUN_API_KEY")}
+    def prep_mail_file_payload(conn, recipients, filename, subject) do
+        contents = File.read filename
+        
+        case contents do
+            {:ok, body} -> 
+                
+                url = "https://api.mailgun.net/v3/emails.thatctoguy.com/messages"
+                headers = ["Content-Type": "application/x-www-form-urlencoded"]
+                params = ["from=info@thatctoguy.com", "subject=" <> subject, "html=" <> body]
+                auth = {"api", System.get_env("MAILGUN_API_KEY")}
 
-        recipients
-            |> Enum.map(&(send_message &1, url, headers, params, auth))
+                recipients
+                    |> Enum.map(&(send_message &1, url, headers, params, auth))
+
+            {:error, error} -> 
+                conn 
+                    |> put_status(:not_found)
+                    |> json(%{ "error" => "file not found"})
+        end
+
+        conn
+            |> put_status(:ok)
+            |> json(%{ "success" => "you did it"})
+        
     end
 
 
